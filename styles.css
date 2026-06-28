@@ -1,0 +1,181 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #050505;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.app {
+  width: min(100%, 430px);
+  margin: 0 auto;
+  padding: 20px;
+  padding-bottom: 40px;
+}
+
+.top-bar {
+  margin-bottom: 20px;
+}
+
+.top-bar h1 {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: -3px;
+}
+
+.top-bar p {
+  margin: 4px 0 0;
+  color: #aaa;
+}
+
+.muscle-card,
+.log-card,
+.history-card {
+  background: #1c1c1f;
+  border: 1px solid #3a3a3d;
+  border-radius: 28px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.muscle-card {
+  text-align: center;
+}
+
+.muscle-card h2 {
+  margin: 0;
+  font-size: 42px;
+  color: #44ff58;
+}
+
+.muscle-card p {
+  margin: 6px 0 18px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.body-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.body-map {
+  width: 130px;
+  height: 230px;
+}
+
+.body-part {
+  stroke: #555;
+  stroke-width: 2;
+}
+
+.neutral {
+  fill: #555;
+}
+
+.muscle {
+  fill: #333;
+  transition: fill 0.25s ease, opacity 0.25s ease;
+}
+
+.active-low {
+  fill: #145c24;
+}
+
+.active-medium {
+  fill: #26b83f;
+}
+
+.active-high {
+  fill: #44ff58;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  text-align: left;
+}
+
+.summary div {
+  background: #111;
+  border-radius: 18px;
+  padding: 12px;
+}
+
+.summary span {
+  display: block;
+  color: #aaa;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.summary strong {
+  font-size: 16px;
+}
+
+.log-card h2,
+.history-card h2 {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin: 14px 0 6px;
+  color: #ddd;
+  font-weight: 700;
+}
+
+select,
+input,
+button {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+}
+
+select,
+input {
+  background: #101010;
+  color: white;
+  border: 1px solid #444;
+  padding: 0 12px;
+}
+
+button {
+  margin-top: 16px;
+  background: #44ff58;
+  color: black;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: transparent;
+  color: #ddd;
+  border: 1px solid #444;
+}
+
+.history-item {
+  background: #111;
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.history-item strong {
+  display: block;
+}
+
+.history-item span {
+  color: #aaa;
+  font-size: 14px;
+}
