@@ -1,83 +1,26 @@
-const muscleGroups = [
-  "chest",
-  "abs",
-  "shoulders",
-  "biceps",
-  "triceps",
-  "forearms",
-  "quads",
-  "calves",
-  "upper_back",
-  "lats",
-  "rear_delts",
-  "glutes",
-  "hamstrings"
-];
-
-const exerciseLibrary = {
-  "Bench Press": {
-    primary: ["chest"],
-    secondary: ["triceps", "shoulders"]
-  },
-  "Incline Dumbbell Press": {
-    primary: ["chest", "shoulders"],
-    secondary: ["triceps"]
-  },
-  "Shoulder Press": {
-    primary: ["shoulders"],
-    secondary: ["triceps"]
-  },
-  "Lat Pulldown": {
-    primary: ["lats"],
-    secondary: ["biceps", "upper_back"]
-  },
-  "Barbell Row": {
-    primary: ["upper_back", "lats"],
-    secondary: ["biceps", "rear_delts"]
-  },
-  "Bicep Curl": {
-    primary: ["biceps"],
-    secondary: ["forearms"]
-  },
-  "Tricep Pushdown": {
-    primary: ["triceps"],
-    secondary: []
-  },
-  "Squat": {
-    primary: ["quads", "glutes"],
-    secondary: ["hamstrings", "abs", "calves"]
-  },
-  "Romanian Deadlift": {
-    primary: ["hamstrings", "glutes"],
-    secondary: ["upper_back"]
-  },
-  "Calf Raise": {
-    primary: ["calves"],
-    secondary: []
-  },
-  "Plank": {
-    primary: ["abs"],
-    secondary: ["shoulders"]
-  }
-};
+const STORAGE_KEY = "lunkWorkouts";
 
 const exerciseSelect = document.getElementById("exerciseSelect");
 const setsInput = document.getElementById("setsInput");
 const logButton = document.getElementById("logButton");
-const clearButton = document.getElementById("clearButton");
+const resetWeekButton = document.getElementById("resetWeekButton");
+
 const coveragePercent = document.getElementById("coveragePercent");
 const mostWorked = document.getElementById("mostWorked");
 const needsWork = document.getElementById("needsWork");
 const historyList = document.getElementById("historyList");
+const muscleDetail = document.getElementById("muscleDetail");
 
-let workouts = JSON.parse(localStorage.getItem("lunkWorkouts")) || [];
+let workouts = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
 function saveWorkouts() {
-  localStorage.setItem("lunkWorkouts", JSON.stringify(workouts));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(workouts));
 }
 
 function populateExerciseSelect() {
-  Object.keys(exerciseLibrary).forEach(exerciseName => {
+  const exerciseNames = Object.keys(exerciseLibrary).sort();
+
+  exerciseNames.forEach(exerciseName => {
     const option = document.createElement("option");
     option.value = exerciseName;
     option.textContent = exerciseName;
@@ -99,6 +42,7 @@ function getStartOfWeek(date) {
 function getThisWeeksWorkouts() {
   const start = getStartOfWeek(new Date());
   const end = new Date(start);
+
   end.setDate(start.getDate() + 7);
 
   return workouts.filter(workout => {
@@ -111,7 +55,10 @@ function getMuscleScores(weeklyWorkouts) {
   const scores = {};
 
   muscleGroups.forEach(muscle => {
-    scores[muscle] = 0;
+    scores[muscle] = {
+      points: 0,
+      exercises: {}
+    };
   });
 
   weeklyWorkouts.forEach(workout => {
@@ -121,11 +68,11 @@ function getMuscleScores(weeklyWorkouts) {
       if (!exerciseInfo) return;
 
       exerciseInfo.primary.forEach(muscle => {
-        scores[muscle] += exercise.sets * 1;
+        addMusclePoints(scores, muscle, exercise.name, exercise.sets, 1);
       });
 
       exerciseInfo.secondary.forEach(muscle => {
-        scores[muscle] += exercise.sets * 0.5;
+        addMusclePoints(scores, muscle, exercise.name, exercise.sets, 0.5);
       });
     });
   });
@@ -133,50 +80,58 @@ function getMuscleScores(weeklyWorkouts) {
   return scores;
 }
 
-function getIntensityClass(score) {
-  if (score >= 6) return "active-high";
-  if (score >= 3) return "active-medium";
-  if (score > 0) return "active-low";
+function addMusclePoints(scores, muscle, exerciseName, sets, multiplier) {
+  if (!scores[muscle]) return;
+
+  const points = sets * multiplier;
+
+  scores[muscle].points += points;
+
+  if (!scores[muscle].exercises[exerciseName]) {
+    scores[muscle].exercises[exerciseName] = 0;
+  }
+
+  scores[muscle].exercises[exerciseName] += points;
+}
+
+function getIntensityClass(points) {
+  if (points >= 8) return "active-high";
+  if (points >= 4) return "active-medium";
+  if (points > 0) return "active-low";
   return "";
 }
 
 function updateBodyMap(scores) {
-  document.querySelectorAll(".muscle").forEach(part => {
-    part.classList.remove("active-low", "active-medium", "active-high");
+  document.querySelectorAll(".muscles path").forEach(path => {
+    path.classList.remove("active-low", "active-medium", "active-high", "selected");
   });
 
-  Object.entries(scores).forEach(([muscle, score]) => {
-    const intensityClass = getIntensityClass(score);
+  Object.entries(scores).forEach(([muscle, data]) => {
+    const intensityClass = getIntensityClass(data.points);
 
     if (!intensityClass) return;
 
-    const mainPart = document.getElementById(muscle);
-
-    if (mainPart) {
-      mainPart.classList.add(intensityClass);
-    }
-
-    document.querySelectorAll(`.${muscle}-copy`).forEach(copy => {
-      copy.classList.add(intensityClass);
+    document.querySelectorAll(`[data-muscle="${muscle}"]`).forEach(path => {
+      path.classList.add(intensityClass);
     });
   });
 }
 
 function updateSummary(scores) {
-  const trainedMuscles = Object.entries(scores).filter(([muscle, score]) => score > 0);
+  const trainedMuscles = Object.entries(scores).filter(([muscle, data]) => data.points > 0);
   const coverage = Math.round((trainedMuscles.length / muscleGroups.length) * 100);
 
   coveragePercent.textContent = `${coverage}%`;
 
-  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const sorted = Object.entries(scores).sort((a, b) => b[1].points - a[1].points);
 
   const topMuscles = sorted
-    .filter(([muscle, score]) => score > 0)
+    .filter(([muscle, data]) => data.points > 0)
     .slice(0, 3)
     .map(([muscle]) => formatMuscleName(muscle));
 
   const neglectedMuscles = sorted
-    .filter(([muscle, score]) => score === 0)
+    .filter(([muscle, data]) => data.points === 0)
     .slice(0, 3)
     .map(([muscle]) => formatMuscleName(muscle));
 
@@ -188,28 +143,132 @@ function updateHistory(weeklyWorkouts) {
   historyList.innerHTML = "";
 
   if (weeklyWorkouts.length === 0) {
-    historyList.innerHTML = "<p>No workouts logged this week.</p>";
+    historyList.innerHTML = `<p class="empty-state">No exercises logged this week.</p>`;
     return;
   }
 
+  const flatExercises = [];
+
   weeklyWorkouts.forEach(workout => {
     workout.exercises.forEach(exercise => {
+      flatExercises.push({
+        name: exercise.name,
+        sets: exercise.sets,
+        date: workout.date
+      });
+    });
+  });
+
+  flatExercises
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .forEach(exercise => {
       const item = document.createElement("div");
       item.className = "history-item";
 
       item.innerHTML = `
         <strong>${exercise.name}</strong>
-        <span>${exercise.sets} sets • ${formatDate(workout.date)}</span>
+        <span>${exercise.sets} sets • ${formatDate(exercise.date)}</span>
       `;
 
       historyList.appendChild(item);
     });
+}
+
+function updateMuscleDetail(muscle, scores) {
+  const data = scores[muscle];
+
+  if (!data) return;
+
+  const exerciseEntries = Object.entries(data.exercises)
+    .sort((a, b) => b[1] - a[1]);
+
+  const exerciseText = exerciseEntries.length
+    ? exerciseEntries.map(([name, points]) => `${name} (${roundPoint(points)})`).join(" • ")
+    : "No exercises hit this muscle this week.";
+
+  muscleDetail.innerHTML = `
+    <span>${formatMuscleName(muscle)}</span>
+    <strong>${roundPoint(data.points)} set-points this week</strong>
+    <span>${exerciseText}</span>
+  `;
+}
+
+function setupMuscleTapEvents() {
+  document.querySelectorAll(".muscles path").forEach(path => {
+    path.addEventListener("click", () => {
+      const muscle = path.dataset.muscle;
+      const weeklyWorkouts = getThisWeeksWorkouts();
+      const scores = getMuscleScores(weeklyWorkouts);
+
+      document.querySelectorAll(".muscles path").forEach(p => {
+        p.classList.remove("selected");
+      });
+
+      document.querySelectorAll(`[data-muscle="${muscle}"]`).forEach(p => {
+        p.classList.add("selected");
+      });
+
+      updateMuscleDetail(muscle, scores);
+    });
   });
+}
+
+function logExercise() {
+  const exerciseName = exerciseSelect.value;
+  const sets = Number(setsInput.value);
+
+  if (!exerciseName || !exerciseLibrary[exerciseName]) {
+    return;
+  }
+
+  if (!Number.isFinite(sets) || sets <= 0) {
+    return;
+  }
+
+  const workout = {
+    id: crypto.randomUUID(),
+    date: new Date().toISOString(),
+    exercises: [
+      {
+        name: exerciseName,
+        sets
+      }
+    ]
+  };
+
+  workouts.push(workout);
+  saveWorkouts();
+  render();
+}
+
+function resetThisWeek() {
+  const confirmed = confirm("Clear this week's logged exercises? Your older history will stay saved.");
+
+  if (!confirmed) return;
+
+  const start = getStartOfWeek(new Date());
+  const end = new Date(start);
+
+  end.setDate(start.getDate() + 7);
+
+  workouts = workouts.filter(workout => {
+    const workoutDate = new Date(workout.date);
+    return workoutDate < start || workoutDate >= end;
+  });
+
+  saveWorkouts();
+
+  muscleDetail.innerHTML = `
+    <span>Tap a muscle</span>
+    <strong>Select a highlighted area to see weekly set-points.</strong>
+  `;
+
+  render();
 }
 
 function formatMuscleName(muscle) {
   return muscle
-    .replace("_", " ")
+    .replaceAll("_", " ")
     .replace(/\b\w/g, letter => letter.toUpperCase());
 }
 
@@ -222,6 +281,10 @@ function formatDate(dateString) {
   });
 }
 
+function roundPoint(value) {
+  return Number.isInteger(value) ? value : value.toFixed(1);
+}
+
 function render() {
   const weeklyWorkouts = getThisWeeksWorkouts();
   const scores = getMuscleScores(weeklyWorkouts);
@@ -231,44 +294,9 @@ function render() {
   updateHistory(weeklyWorkouts);
 }
 
-function logExercise() {
-  const exerciseName = exerciseSelect.value;
-  const sets = Number(setsInput.value);
-
-  if (!exerciseName || sets <= 0) return;
-
-  const workout = {
-    id: crypto.randomUUID(),
-    date: new Date().toISOString(),
-    exercises: [
-      {
-        name: exerciseName,
-        sets: sets
-      }
-    ]
-  };
-
-  workouts.push(workout);
-  saveWorkouts();
-  render();
-}
-
-function clearThisWeek() {
-  const start = getStartOfWeek(new Date());
-  const end = new Date(start);
-  end.setDate(start.getDate() + 7);
-
-  workouts = workouts.filter(workout => {
-    const workoutDate = new Date(workout.date);
-    return workoutDate < start || workoutDate >= end;
-  });
-
-  saveWorkouts();
-  render();
-}
-
 logButton.addEventListener("click", logExercise);
-clearButton.addEventListener("click", clearThisWeek);
+resetWeekButton.addEventListener("click", resetThisWeek);
 
 populateExerciseSelect();
+setupMuscleTapEvents();
 render();

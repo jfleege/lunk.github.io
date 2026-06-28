@@ -6,62 +6,117 @@
   <title>Lunk</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <main class="app">
-    <header class="top-bar">
-      <h1>lunk</h1>
-      <p>Weekly muscle coverage</p>
+    <header class="app-header">
+      <div>
+        <h1>lunk</h1>
+        <p>Weekly muscle coverage</p>
+      </div>
+      <button id="resetWeekButton" class="small-button">Reset</button>
     </header>
 
-    <section class="muscle-card">
-      <h2><span id="coveragePercent">0%</span></h2>
-      <p>Muscles Worked This Week</p>
+    <section class="coverage-card">
+      <div class="coverage-top">
+        <h2 id="coveragePercent">0%</h2>
+        <p>Muscles Worked This Week</p>
+      </div>
 
-      <div class="body-row">
-        <svg class="body-map" viewBox="0 0 160 300">
-          <circle cx="80" cy="28" r="18" class="body-part neutral" />
+      <div class="body-wrapper">
+        <svg class="body-map" viewBox="0 0 220 430" aria-label="Front muscle map">
+          <g class="outline">
+            <circle cx="110" cy="38" r="24"></circle>
+            <path d="M82 70 Q110 54 138 70 L150 118 Q143 184 130 220 L90 220 Q77 184 70 118 Z"></path>
+            <path d="M70 92 L38 112 Q25 152 28 225"></path>
+            <path d="M150 92 L182 112 Q195 152 192 225"></path>
+            <path d="M88 218 L75 388"></path>
+            <path d="M132 218 L145 388"></path>
+          </g>
 
-          <rect x="58" y="50" width="44" height="70" rx="18" class="body-part neutral" />
+          <g class="muscles">
+            <path data-muscle="front_delts" d="M64 92 Q76 73 95 78 Q83 92 77 116 Q65 112 56 103 Z"></path>
+            <path data-muscle="front_delts" d="M156 92 Q144 73 125 78 Q137 92 143 116 Q155 112 164 103 Z"></path>
 
-          <rect id="chest" x="54" y="58" width="52" height="28" rx="10" class="body-part muscle" />
-          <rect id="abs" x="62" y="90" width="36" height="45" rx="10" class="body-part muscle" />
+            <path data-muscle="upper_chest" d="M84 82 Q101 72 110 91 Q96 102 78 101 Z"></path>
+            <path data-muscle="upper_chest" d="M136 82 Q119 72 110 91 Q124 102 142 101 Z"></path>
 
-          <rect id="shoulders" x="35" y="55" width="90" height="18" rx="9" class="body-part muscle" />
+            <path data-muscle="chest" d="M78 103 Q95 96 109 98 L106 132 Q88 135 75 121 Z"></path>
+            <path data-muscle="chest" d="M142 103 Q125 96 111 98 L114 132 Q132 135 145 121 Z"></path>
 
-          <rect id="biceps" x="28" y="80" width="20" height="70" rx="10" class="body-part muscle" />
-          <rect id="triceps" x="112" y="80" width="20" height="70" rx="10" class="body-part muscle" />
+            <path data-muscle="abs" d="M96 135 L124 135 L129 204 L91 204 Z"></path>
+            <path data-muscle="abs" d="M98 140 L122 140"></path>
+            <path data-muscle="abs" d="M95 160 L125 160"></path>
+            <path data-muscle="abs" d="M93 181 L127 181"></path>
+            <path data-muscle="abs" d="M110 136 L110 204"></path>
 
-          <rect id="forearms" x="22" y="145" width="18" height="65" rx="9" class="body-part muscle" />
-          <rect x="120" y="145" width="18" height="65" rx="9" class="body-part muscle forearms-copy" />
+            <path data-muscle="obliques" d="M76 126 Q90 143 91 204 L76 199 Q68 161 70 134 Z"></path>
+            <path data-muscle="obliques" d="M144 126 Q130 143 129 204 L144 199 Q152 161 150 134 Z"></path>
 
-          <rect id="quads" x="52" y="135" width="24" height="90" rx="10" class="body-part muscle" />
-          <rect x="84" y="135" width="24" height="90" rx="10" class="body-part muscle quads-copy" />
+            <path data-muscle="biceps" d="M44 115 Q62 120 60 176 Q52 190 39 177 Q36 138 44 115 Z"></path>
+            <path data-muscle="biceps" d="M176 115 Q158 120 160 176 Q168 190 181 177 Q184 138 176 115 Z"></path>
 
-          <rect id="calves" x="54" y="220" width="20" height="65" rx="10" class="body-part muscle" />
-          <rect x="86" y="220" width="20" height="65" rx="10" class="body-part muscle calves-copy" />
+            <path data-muscle="forearms" d="M38 181 Q56 186 53 245 Q45 263 30 247 Q28 210 38 181 Z"></path>
+            <path data-muscle="forearms" d="M182 181 Q164 186 167 245 Q175 263 190 247 Q192 210 182 181 Z"></path>
+
+            <path data-muscle="adductors" d="M95 216 Q105 230 105 298 Q94 275 85 230 Z"></path>
+            <path data-muscle="adductors" d="M125 216 Q115 230 115 298 Q126 275 135 230 Z"></path>
+
+            <path data-muscle="quads" d="M76 220 Q95 218 101 240 Q99 298 86 333 Q70 306 69 250 Z"></path>
+            <path data-muscle="quads" d="M144 220 Q125 218 119 240 Q121 298 134 333 Q150 306 151 250 Z"></path>
+
+            <path data-muscle="calves" d="M79 326 Q95 338 92 390 Q84 414 72 392 Q70 355 79 326 Z"></path>
+            <path data-muscle="calves" d="M141 326 Q125 338 128 390 Q136 414 148 392 Q150 355 141 326 Z"></path>
+          </g>
         </svg>
 
-        <svg class="body-map" viewBox="0 0 160 300">
-          <circle cx="80" cy="28" r="18" class="body-part neutral" />
+        <svg class="body-map" viewBox="0 0 220 430" aria-label="Back muscle map">
+          <g class="outline">
+            <circle cx="110" cy="38" r="24"></circle>
+            <path d="M82 70 Q110 54 138 70 L150 118 Q143 184 130 220 L90 220 Q77 184 70 118 Z"></path>
+            <path d="M70 92 L38 112 Q25 152 28 225"></path>
+            <path d="M150 92 L182 112 Q195 152 192 225"></path>
+            <path d="M88 218 L75 388"></path>
+            <path d="M132 218 L145 388"></path>
+          </g>
 
-          <rect x="58" y="50" width="44" height="70" rx="18" class="body-part neutral" />
+          <g class="muscles">
+            <path data-muscle="traps" d="M88 70 Q110 58 132 70 L121 100 L110 87 L99 100 Z"></path>
 
-          <rect id="upper_back" x="55" y="58" width="50" height="48" rx="12" class="body-part muscle" />
-          <rect id="lats" x="42" y="75" width="76" height="60" rx="15" class="body-part muscle" />
+            <path data-muscle="rear_delts" d="M64 92 Q78 75 98 80 Q84 94 78 116 Q65 113 55 103 Z"></path>
+            <path data-muscle="rear_delts" d="M156 92 Q142 75 122 80 Q136 94 142 116 Q155 113 165 103 Z"></path>
 
-          <rect id="rear_delts" x="35" y="55" width="90" height="18" rx="9" class="body-part muscle" />
+            <path data-muscle="rhomboids" d="M90 94 L110 88 L130 94 L120 128 L100 128 Z"></path>
 
-          <rect id="glutes" x="52" y="128" width="56" height="38" rx="16" class="body-part muscle" />
+            <path data-muscle="lats" d="M74 105 Q95 126 101 178 L88 205 Q71 170 69 126 Z"></path>
+            <path data-muscle="lats" d="M146 105 Q125 126 119 178 L132 205 Q149 170 151 126 Z"></path>
 
-          <rect id="hamstrings" x="52" y="165" width="24" height="70" rx="10" class="body-part muscle" />
-          <rect x="84" y="165" width="24" height="70" rx="10" class="body-part muscle hamstrings-copy" />
+            <path data-muscle="lower_back" d="M96 170 L124 170 L130 216 L90 216 Z"></path>
 
-          <rect id="back_calves" x="54" y="230" width="20" height="55" rx="10" class="body-part muscle calves-copy" />
-          <rect x="86" y="230" width="20" height="55" rx="10" class="body-part muscle calves-copy" />
+            <path data-muscle="triceps" d="M44 115 Q62 120 60 180 Q52 195 39 178 Q36 138 44 115 Z"></path>
+            <path data-muscle="triceps" d="M176 115 Q158 120 160 180 Q168 195 181 178 Q184 138 176 115 Z"></path>
+
+            <path data-muscle="forearms" d="M38 181 Q56 186 53 245 Q45 263 30 247 Q28 210 38 181 Z"></path>
+            <path data-muscle="forearms" d="M182 181 Q164 186 167 245 Q175 263 190 247 Q192 210 182 181 Z"></path>
+
+            <path data-muscle="glutes" d="M86 216 Q108 206 110 242 Q98 262 82 248 Q77 231 86 216 Z"></path>
+            <path data-muscle="glutes" d="M134 216 Q112 206 110 242 Q122 262 138 248 Q143 231 134 216 Z"></path>
+
+            <path data-muscle="hamstrings" d="M76 250 Q94 240 101 260 Q99 309 86 340 Q70 316 69 270 Z"></path>
+            <path data-muscle="hamstrings" d="M144 250 Q126 240 119 260 Q121 309 134 340 Q150 316 151 270 Z"></path>
+
+            <path data-muscle="calves" d="M79 326 Q95 338 92 390 Q84 414 72 392 Q70 355 79 326 Z"></path>
+            <path data-muscle="calves" d="M141 326 Q125 338 128 390 Q136 414 148 392 Q150 355 141 326 Z"></path>
+          </g>
         </svg>
       </div>
 
-      <div class="summary">
+      <div class="muscle-detail" id="muscleDetail">
+        <span>Tap a muscle</span>
+        <strong>Select a highlighted area to see weekly set-points.</strong>
+      </div>
+
+      <div class="summary-grid">
         <div>
           <span>Most worked</span>
           <strong id="mostWorked">None yet</strong>
@@ -83,7 +138,6 @@
       <input id="setsInput" type="number" min="1" value="3" />
 
       <button id="logButton">Log Exercise</button>
-      <button id="clearButton" class="secondary">Clear This Week</button>
     </section>
 
     <section class="history-card">
@@ -92,6 +146,7 @@
     </section>
   </main>
 
+  <script src="exercises.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
